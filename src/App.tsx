@@ -1,9 +1,9 @@
-import React from 'react';
-import './App.css';
-import styled from 'styled-components';
-import GlobalStyle from './style/GlobalStyle';
-import SideBar from './components/SideBar';
-import Viewer from './components/Viewer';
+import React from "react";
+import styled from "styled-components";
+
+import GlobalStyle from "./style/GlobalStyle";
+import SideBar from "./components/SideBar";
+import Viewer from "./components/Viewer";
 
 function App() {
   return (
