@@ -1,21 +1,21 @@
-import React from 'react';
-import styled from 'styled-components';
-import { TypedIcon } from 'typed-design-system';
+import React from "react";
+import styled from "styled-components";
+import { TypedIcon } from "typed-design-system";
 
 export default function ContentBox() {
   return (
     <ContentWrap>
       <ResourceName>https://www.youtube.com/watch?v=M-6R6-C6DnI</ResourceName>
       <ButtonWrap>
-        <TypedIcon icon="edit_19" />
-        <TypedIcon icon="trash_19" />
+        <TypedIcon icon="edit_19" size={19} style={{ cursor: "pointer" }} />
+        <TypedIcon icon="trash_19" size={19} style={{ cursor: "pointer" }} />
       </ButtonWrap>
     </ContentWrap>
   );
 }
 
 const ContentWrap = styled.article`
-  margin: 10px 10px 0px 10px;
+  margin: 5px 10px 5px 10px;
   background-color: var(--color-white);
   height: 90px;
   padding: 12px;

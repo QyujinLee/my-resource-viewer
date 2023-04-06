@@ -1,25 +1,25 @@
-import React from 'react';
-import styled from 'styled-components';
-import { TypedIcon } from 'typed-design-system';
+import React from "react";
+import styled from "styled-components";
+import { TypedIcon } from "typed-design-system";
 
 export default function Viewer() {
   return (
     <ViewerWrap>
       <ViewerHeader>
         <ResourceName>https://www.youtube.com/watch?v=M-6R6-C6DnI</ResourceName>
-        <TypedIcon icon="close_19" />
+        <TypedIcon icon="close_19" style={{ cursor: "pointer" }} />
       </ViewerHeader>
     </ViewerWrap>
   );
 }
 
-const ViewerWrap = styled.section`
+const ViewerWrap = styled.article`
   height: 100vh;
   background-color: var(--color-white);
   flex-grow: 1;
 `;
 
-const ViewerHeader = styled.div`
+const ViewerHeader = styled.header`
   padding: 0px 17px;
   height: 50px;
   display: flex;
