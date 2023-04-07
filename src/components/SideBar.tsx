@@ -2,24 +2,25 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import { useRecoilState } from 'recoil';
 
 import ContentBox from './SideBarItems/ContentBox';
 import { contentsList } from '../store/store';
-import { useRecoilState } from 'recoil';
 import { ContentType } from '../types/ContentType';
 import { useToast } from '../hooks/useToast';
 import { TOAST_MSG } from '../constants/const';
 
 type UrlResult = {
   isYouTubeUrl: boolean;
-  origin: string;
-  converted: string;
+  resourceName: string;
+  resourceValue: string;
 };
 
 export default function SideBar() {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isShowInput, setIsShowInput] = useState<boolean>(false);
   const [contents, setContents] = useRecoilState(contentsList);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputImgRef = useRef<HTMLInputElement>(null);
 
   /**
    * youtube Url 검증 및 변경된 결과값 반환
@@ -29,8 +30,8 @@ export default function SideBar() {
   const convertToEmbeddedURL = (url: string): UrlResult => {
     let result = {
       isYouTubeUrl: false,
-      origin: url,
-      converted: url,
+      resourceName: url,
+      resourceValue: url,
     };
 
     const regExp =
@@ -42,7 +43,7 @@ export default function SideBar() {
       result = {
         ...result,
         isYouTubeUrl: true,
-        converted: `https://www.youtube.com/embed/${videoId}`,
+        resourceValue: `https://www.youtube.com/embed/${videoId}`,
       };
     }
 
@@ -64,8 +65,8 @@ export default function SideBar() {
       const delay = Math.floor(Math.random() * (max - min + 1) + min);
 
       setTimeout(() => {
-        setContents([
-          ...contents,
+        setContents((prev) => [
+          ...prev,
           {
             id: uuidv4(),
             type,
@@ -94,7 +95,8 @@ export default function SideBar() {
    * 이미지 추가 클릭 핸들러
    */
   const handleClickAddImg = () => {
-    useToast({ type: 'error', message: TOAST_MSG.CREATE_ERROR });
+    if (!inputImgRef.current) return;
+    inputImgRef.current.click();
   };
 
   /**
@@ -119,12 +121,12 @@ export default function SideBar() {
 
     if (urlRegex.test(value)) {
       // 유튜브 url인지 확인하고 embeded 형식으로 변경
-      const urlValue = convertToEmbeddedURL(value);
+      const { isYouTubeUrl, resourceName, resourceValue } = convertToEmbeddedURL(value);
 
       addContents({
         type: 'url',
-        resourceName: urlValue.origin,
-        resourceValue: urlValue.converted,
+        resourceName,
+        resourceValue,
       });
     } else {
       useToast({ type: 'error', message: TOAST_MSG.CREATE_ERROR });
@@ -133,6 +135,41 @@ export default function SideBar() {
     // 초기화
     inputRef.current.value = '';
     setIsShowInput(false);
+  };
+
+  /**
+   * 이미지 인코딩
+   * @param file
+   * @returns
+   */
+  const encodeImageFileAsURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  /**
+   * 이미지 업로드
+   * @returns
+   */
+  const handleImageUpload = async () => {
+    if (!inputImgRef.current?.files) return;
+
+    const files = Array.from(inputImgRef.current.files).filter(
+      (file) => file.type === 'image/jpeg' || file.type === 'image/png'
+    );
+
+    const encodedFiles = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        dataUrl: await encodeImageFileAsURL(file),
+      }))
+    );
+
+    encodedFiles.forEach((item) => addContents({ type: 'img', resourceName: item.name, resourceValue: item.dataUrl }));
   };
 
   useEffect(() => {
@@ -146,6 +183,7 @@ export default function SideBar() {
       <SideBarHeader>
         <SideBarHeaderButton onClick={handleClickAddUrl}>URL 추가</SideBarHeaderButton>
         <SideBarHeaderButton onClick={handleClickAddImg}>이미지 추가</SideBarHeaderButton>
+        <InputImg type="file" accept=".jpg,.jpeg,.png" multiple ref={inputImgRef} onChange={handleImageUpload} />
       </SideBarHeader>
       {isShowInput && (
         <InputBox>
@@ -171,7 +209,7 @@ const SideBarWrap = styled.aside`
 `;
 
 const SideBarHeader = styled.div`
-  width: 100%;
+  width: 280px;
   padding: 10px;
   background-color: var(--color-white);
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
@@ -218,6 +256,10 @@ const InputUrl = styled.input`
     border: 1px solid var(--color-blue);
     border-radius: 3px;
   }
+`;
+
+const InputImg = styled.input`
+  display: none;
 `;
 
 const Contents = styled.div`

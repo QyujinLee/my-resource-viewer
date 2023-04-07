@@ -1,13 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
 import { RecoilRoot } from 'recoil';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import GlobalStyle from './style/GlobalStyle';
-import SideBar from './components/SideBar';
-import Viewer from './components/Viewer';
 import { containerOptions } from './hooks/useToast';
+import Main from './components/Main';
 
 function App() {
   return (
@@ -15,19 +13,10 @@ function App() {
       <RecoilRoot>
         <GlobalStyle />
         <ToastContainer {...containerOptions} />
-        <Main>
-          <SideBar />
-          <Viewer />
-        </Main>
+        <Main />
       </RecoilRoot>
     </div>
   );
 }
 
 export default App;
-
-const Main = styled.main`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-`;
