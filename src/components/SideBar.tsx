@@ -216,6 +216,7 @@ const SideBarHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-right: 1px solid var(--color-gray);
   z-index: 1;
 `;
 
