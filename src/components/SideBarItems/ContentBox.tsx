@@ -1,14 +1,20 @@
-import React from "react";
-import styled from "styled-components";
-import { TypedIcon } from "typed-design-system";
+import React from 'react';
+import styled from 'styled-components';
+import { TypedIcon } from 'typed-design-system';
 
-export default function ContentBox() {
+import { ContentType } from '../../types/ContentType';
+
+export default function ContentBox({
+  type,
+  resourceName,
+  resourceValue,
+}: ContentType) {
   return (
     <ContentWrap>
-      <ResourceName>https://www.youtube.com/watch?v=M-6R6-C6DnI</ResourceName>
+      <ResourceName>{resourceName}</ResourceName>
       <ButtonWrap>
-        <TypedIcon icon="edit_19" size={19} style={{ cursor: "pointer" }} />
-        <TypedIcon icon="trash_19" size={19} style={{ cursor: "pointer" }} />
+        <TypedIcon icon="edit_19" size={19} style={{ cursor: 'pointer' }} />
+        <TypedIcon icon="trash_19" size={19} style={{ cursor: 'pointer' }} />
       </ButtonWrap>
     </ContentWrap>
   );

@@ -1,18 +1,25 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
+import { RecoilRoot } from 'recoil';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import GlobalStyle from "./style/GlobalStyle";
-import SideBar from "./components/SideBar";
-import Viewer from "./components/Viewer";
+import GlobalStyle from './style/GlobalStyle';
+import SideBar from './components/SideBar';
+import Viewer from './components/Viewer';
+import { containerOptions } from './hooks/useToast';
 
 function App() {
   return (
     <div className="App">
-      <GlobalStyle />
-      <Main>
-        <SideBar />
-        <Viewer />
-      </Main>
+      <RecoilRoot>
+        <GlobalStyle />
+        <ToastContainer {...containerOptions} />
+        <Main>
+          <SideBar />
+          <Viewer />
+        </Main>
+      </RecoilRoot>
     </div>
   );
 }

@@ -1,14 +1,88 @@
-import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
+import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
-import ContentBox from "./SideBarItems/ContentBox";
+import ContentBox from './SideBarItems/ContentBox';
+import { contentsList } from '../store/store';
+import { useRecoilState } from 'recoil';
+import { ContentType } from '../types/ContentType';
+import { useToast } from '../hooks/useToast';
+import { TOAST_MSG } from '../constants/const';
+
+type UrlResult = {
+  isYouTubeUrl: boolean;
+  origin: string;
+  converted: string;
+};
 
 export default function SideBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isShowInput, setIsShowInput] = useState<boolean>(false);
+  const [contents, setContents] = useRecoilState(contentsList);
 
   /**
-   * URL 추가 클릭 이벤트
+   * youtube Url 검증 및 변경된 결과값 반환
+   * @param url
+   * @returns
+   */
+  const convertToEmbeddedURL = (url: string): UrlResult => {
+    let result = {
+      isYouTubeUrl: false,
+      origin: url,
+      converted: url,
+    };
+
+    const regExp =
+      /^(?:https?:\/\/)?(?:www\.)?(?:(?:youtube.com\/(?:(?:watch\?v=)|(?:embed\/))([a-zA-Z0-9-]{11}))|(?:youtu.be\/([a-zA-Z0-9-]{11})))/;
+    const match = url.match(regExp);
+    const videoId = match ? match[1] || match[2] : undefined;
+
+    if (videoId) {
+      result = {
+        ...result,
+        isYouTubeUrl: true,
+        converted: `https://www.youtube.com/embed/${videoId}`,
+      };
+    }
+
+    return result;
+  };
+
+  /**
+   * 컨텐츠 추가
+   * @param param0
+   */
+  const addContents = ({
+    type,
+    resourceName,
+    resourceValue,
+  }: Pick<ContentType, 'type' | 'resourceName' | 'resourceValue'>) => {
+    if (Math.random() < 0.8) {
+      const min = 300;
+      const max = 1000;
+      const delay = Math.floor(Math.random() * (max - min + 1) + min);
+
+      setTimeout(() => {
+        setContents([
+          ...contents,
+          {
+            id: uuidv4(),
+            type,
+            resourceName,
+            resourceValue,
+          },
+        ]);
+
+        useToast({ type: 'success', message: TOAST_MSG.CREATE_SUCCESS });
+      }, delay);
+    } else {
+      useToast({ type: 'error', message: TOAST_MSG.CREATE_STOCHASTIC_ERROR });
+    }
+  };
+
+  /**
+   * URL 추가 클릭 핸들러
    */
   const handleClickAddUrl = () => {
     if (!isShowInput) {
@@ -17,33 +91,48 @@ export default function SideBar() {
   };
 
   /**
-   * 이미지 추가 클릭 이벤트
+   * 이미지 추가 클릭 핸들러
    */
-  const handleClickAddImg = () => {};
+  const handleClickAddImg = () => {
+    useToast({ type: 'error', message: TOAST_MSG.CREATE_ERROR });
+  };
 
   /**
-   * URL 인풋 blur 이벤트
+   * URL 인풋 blur 핸들러
    */
   const handleBlurInput = () => {
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = '';
     }
     setIsShowInput(false);
   };
 
   /**
-   * URL 인풋 Enter입력 이벤트
+   * URL 인풋 Enter입력 핸들러
    * @param e
    */
   const handleKeyUpInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      console.log("아이템 등록");
+    if (e.key !== 'Enter' || !inputRef.current) return;
 
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
-      setIsShowInput(false);
+    const urlRegex: RegExp = /^https?:\/\//i;
+    const value = _.cloneDeep(inputRef.current.value);
+
+    if (urlRegex.test(value)) {
+      // 유튜브 url인지 확인하고 embeded 형식으로 변경
+      const urlValue = convertToEmbeddedURL(value);
+
+      addContents({
+        type: 'url',
+        resourceName: urlValue.origin,
+        resourceValue: urlValue.converted,
+      });
+    } else {
+      useToast({ type: 'error', message: TOAST_MSG.CREATE_ERROR });
     }
+
+    // 초기화
+    inputRef.current.value = '';
+    setIsShowInput(false);
   };
 
   useEffect(() => {
@@ -55,47 +144,18 @@ export default function SideBar() {
   return (
     <SideBarWrap>
       <SideBarHeader>
-        <SideBarHeaderButton onClick={handleClickAddUrl}>
-          URL 추가
-        </SideBarHeaderButton>
-        <SideBarHeaderButton onClick={handleClickAddImg}>
-          이미지 추가
-        </SideBarHeaderButton>
+        <SideBarHeaderButton onClick={handleClickAddUrl}>URL 추가</SideBarHeaderButton>
+        <SideBarHeaderButton onClick={handleClickAddImg}>이미지 추가</SideBarHeaderButton>
       </SideBarHeader>
       {isShowInput && (
         <InputBox>
-          <InputUrl
-            ref={inputRef}
-            onBlur={handleBlurInput}
-            onKeyUp={handleKeyUpInput}
-          ></InputUrl>
+          <InputUrl ref={inputRef} onBlur={handleBlurInput} onKeyUp={handleKeyUpInput}></InputUrl>
         </InputBox>
       )}
       <Contents>
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
-        <ContentBox />
+        {contents.map((item) => (
+          <ContentBox key={item.id} {...item} />
+        ))}
       </Contents>
     </SideBarWrap>
   );
