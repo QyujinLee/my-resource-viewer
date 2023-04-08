@@ -6,7 +6,7 @@ import { isShowViewer } from '../store/store';
 import SideBar from './SideBar';
 import Viewer from './Viewer';
 
-export default function Main() {
+export default function MainContainer() {
   const isVisibleViewer = useRecoilValue(isShowViewer);
 
   return (

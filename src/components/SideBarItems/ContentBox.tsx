@@ -159,9 +159,7 @@ const ResourceName = styled.p`
   font-size: var(--font-semi-small);
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  max-height: 3em;
 `;
 
 const ButtonWrap = styled.div`

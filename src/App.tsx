@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import GlobalStyle from './style/GlobalStyle';
 import { containerOptions } from './hooks/useToast';
-import Main from './components/Main';
+import MainContainer from './components/MainContainer';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
       <RecoilRoot>
         <GlobalStyle />
         <ToastContainer {...containerOptions} />
-        <Main />
+        <MainContainer />
       </RecoilRoot>
     </div>
   );

@@ -11,7 +11,6 @@ import { useToast } from '../hooks/useToast';
 import { TOAST_MSG } from '../constants/const';
 
 type UrlResult = {
-  isYouTubeUrl: boolean;
   resourceName: string;
   resourceValue: string;
 };
@@ -29,7 +28,6 @@ export default function SideBar() {
    */
   const convertToEmbeddedURL = (url: string): UrlResult => {
     let result = {
-      isYouTubeUrl: false,
       resourceName: url,
       resourceValue: url,
     };
@@ -42,7 +40,6 @@ export default function SideBar() {
     if (videoId) {
       result = {
         ...result,
-        isYouTubeUrl: true,
         resourceValue: `https://www.youtube.com/embed/${videoId}`,
       };
     }
@@ -59,7 +56,7 @@ export default function SideBar() {
     resourceName,
     resourceValue,
   }: Pick<ContentType, 'type' | 'resourceName' | 'resourceValue'>) => {
-    if (Math.random() < 0.8) {
+    if (Math.random() <= 0.8) {
       const min = 300;
       const max = 1000;
       const delay = Math.floor(Math.random() * (max - min + 1) + min);
@@ -120,8 +117,7 @@ export default function SideBar() {
     const value = _.cloneDeep(inputRef.current.value);
 
     if (urlRegex.test(value)) {
-      // 유튜브 url인지 확인하고 embeded 형식으로 변경
-      const { isYouTubeUrl, resourceName, resourceValue } = convertToEmbeddedURL(value);
+      const { resourceName, resourceValue } = convertToEmbeddedURL(value);
 
       addContents({
         type: 'url',
